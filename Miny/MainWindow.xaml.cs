@@ -26,7 +26,9 @@ namespace Miny
         int cols = 10;
         int rows = 10;
         bool lost = false;
+        bool won = false;
         bool firstClick = false;
+        int flags;
         int[,] playGround = new int[10, 10];
         public MainWindow()
         {
@@ -35,7 +37,6 @@ namespace Miny
             Announce.Content = "Game has started!";
             Board.Children.Clear();
             generateGrid(cols, rows);
-            generatePlayGround();
             renderGrid();
             Board.ShowGridLines = true;
         }
@@ -44,15 +45,18 @@ namespace Miny
             Announce.Foreground = Brushes.Black;
             Announce.Content = "Game has started!";
             playGround = new int[10, 10];
+            lost = false;
+            won = false;
+            firstClick = false;
             Board.Children.Clear();
             generateGrid(cols, rows);
-            generatePlayGround();
             renderGrid();
             Board.ShowGridLines = true;
         }
-        void generatePlayGround()
+        void generatePlayGround(int col = 0, int row = 0)
         {
             int bombs = difficulty * 10;
+            flags = difficulty * 10;
             Random rand = new Random();
             while (bombs > 0)
             {
@@ -62,8 +66,15 @@ namespace Miny
                     {
                         if (rand.Next(0, 80) == 10 && playGround[_col, _row] != 9)
                         {
-                            playGround[_col, _row] = 9;
-                            bombs--;
+                            if (col != _col && col - 1 != col && col - 1 != col && row != _row && row - 1 != _row && row + 1 != _row)
+                            {
+                                if (bombs > 0)
+                                {
+                                    playGround[_col, _row] = 9;
+                                    bombs--;
+                                }
+                            }
+
                         }
                     }
                 }
@@ -72,6 +83,8 @@ namespace Miny
         void renderGrid()
         {
             Board.Children.Clear();
+            int empty = 0;
+            int flaggedBombs = 0;
             for (int _row = 0; _row < rows; _row++)
             {
                 for (int _col = 0; _col < cols; _col++)
@@ -104,14 +117,14 @@ namespace Miny
                     //QUESTIONMARK NUMBER
                     else if (playGround[_col, _row] >= 21 && playGround[_col, _row] <= 28)
                     {
-                        button.Content = "F";
+                        button.Content = "?";
                         button.Foreground = Brushes.Red;
                         button.Background = Brushes.DarkGray;
                     }
                     //QUESTIONMARK BOMB
                     else if (playGround[_col, _row] == 29)
                     {
-                        button.Content = "F";
+                        button.Content = "?";
                         button.Foreground = Brushes.Red;
                         button.Background = Brushes.DarkGray;
                     }
@@ -121,6 +134,7 @@ namespace Miny
                         button.Content = "F";
                         button.Foreground = Brushes.Red;
                         button.Background = Brushes.DarkGray;
+                        flaggedBombs++;
                     }
                     //FLAG EMPTY
                     else if (playGround[_col, _row] == 20)
@@ -132,7 +146,7 @@ namespace Miny
                     //QUESTIONMARK EMPTY
                     else if (playGround[_col, _row] == 30)
                     {
-                        button.Content = "F";
+                        button.Content = "?";
                         button.Foreground = Brushes.Red;
                         button.Background = Brushes.DarkGray;
                     }
@@ -153,6 +167,7 @@ namespace Miny
                     {
                         button.Content = "";
                         button.Background = Brushes.DarkGray;
+                        empty++;
                     }
                     button.Click += clickButtonLeft;
                     button.MouseRightButtonUp += clickButtonRight;
@@ -161,6 +176,14 @@ namespace Miny
                     Board.Children.Add(button);
                 }
             }
+
+            if (empty == 0 && flaggedBombs == difficulty * 10)
+            {
+                won = true;
+                Announce.Content = "You Won!";
+                Announce.Foreground = Brushes.Green;
+            }
+            Flags.Content = "Flags: " + flags;
         }
 
         int countBombs(int[,] playGround, int _col, int _row)
@@ -170,7 +193,7 @@ namespace Miny
             // LEFT
             if (_col > 0)
             {
-                if (playGround[_col - 1, _row]%10 == 9) bombCounter++;
+                if (playGround[_col - 1, _row] % 10 == 9) bombCounter++;
             }
             // LEFT DIAGONAL UP
             if (_col > 0 && _row > 0)
@@ -214,7 +237,6 @@ namespace Miny
 
         void showNotShown(int col, int row)
         {
-
             if (col > 0)
             {
                 int nextCol = col - 1;
@@ -298,8 +320,10 @@ namespace Miny
             if (value >= 11 && value <= 20)
             {
                 playGround[col, row] = value % 10;
+                value = value % 10;
+                flags++;
             }
-            
+
             // BOMB CLICK
             if (value == 9)
             {
@@ -321,35 +345,89 @@ namespace Miny
             }
             // FLAG CLICK
             renderGrid();
-
         }
 
         void placeFlag(int col, int row)
         {
-            if (playGround[col, row] == 9)
+            if (flags > 0)
             {
-                playGround[col, row] = 19;
-            }
-            else if (playGround[col, row] == 0)
-            {
-                playGround[col, row] = 20;
-            }
-            else if (countBombs(playGround, col, row) > 0)
-            {
-                playGround[col, row] = countBombs(playGround, col, row) + 10;
+                if (playGround[col, row] == 9)
+                {
+                    playGround[col, row] = 19;
+                    flags--;
+                }
+                else if (playGround[col, row] == 0)
+                {
+                    playGround[col, row] = 20;
+                    flags--;
+                }
+                else if (countBombs(playGround, col, row) > 0 && playGround[col, row] == 0)
+                {
+                    playGround[col, row] = countBombs(playGround, col, row) + 10;
+                    flags--;
+                }
             }
             renderGrid();
         }
 
+        void placeQuestionMark(int col, int row)
+        {
+            if (playGround[col, row] % 10 == 9)
+            {
+                playGround[col, row] = 29;
+            }
+            else if (playGround[col, row] % 10 == 0)
+            {
+                playGround[col, row] = 30;
+            }
+            else if (countBombs(playGround, col, row) > 0 && playGround[col, row] == 0)
+            {
+                playGround[col, row] = countBombs(playGround, col, row) + 20;
+            }
+
+        }
+
         void clickButtonLeft(object sender, RoutedEventArgs e)
         {
-            checkClick(Grid.GetColumn((Button)sender), Grid.GetRow((Button)sender));
-            renderGrid();
+            if (!lost && !won)
+            {
+                if (!firstClick)
+                {
+                    generatePlayGround(Grid.GetColumn((Button)sender), Grid.GetRow((Button)sender));
+                    firstClick = true;
+                }
+                checkClick(Grid.GetColumn((Button)sender), Grid.GetRow((Button)sender));
+            }
+            
         }
+
         void clickButtonRight(object sender, MouseEventArgs e)
         {
-            Debug.WriteLine("prdel");
-            placeFlag(Grid.GetColumn((Button)sender), Grid.GetRow((Button)sender));
+            if (!lost && !won)
+            {
+                int _col = Grid.GetColumn((Button)sender);
+                int _row = Grid.GetRow((Button)sender);
+                int value = playGround[_col, _row];
+                if (value >= 11 && value <= 20)
+                {
+                    placeQuestionMark(_col, _row);
+                    flags++;
+                }
+                else if (value <= 10)
+                {
+                    placeFlag(_col, _row);
+                }
+                else
+                {
+                    playGround[_col, _row] = value % 10;
+                }
+                renderGrid();
+            }
+        }
+
+        private void Reset_Click(object sender, RoutedEventArgs e)
+        {
+            startGame(cols, rows);
         }
 
         void generateGrid(int cols, int rows)
@@ -365,6 +443,7 @@ namespace Miny
                 Board.RowDefinitions.Add(new RowDefinition());
             }
         }
+
 
     }
 }
