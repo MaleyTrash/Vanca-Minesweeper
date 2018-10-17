@@ -25,6 +25,8 @@ namespace Miny
         int difficulty = 1;
         int cols = 10;
         int rows = 10;
+        bool lost = false;
+        bool firstClick = false;
         int[,] playGround = new int[10, 10];
         public MainWindow()
         {
@@ -50,15 +52,15 @@ namespace Miny
         }
         void generatePlayGround()
         {
-            int bombs = difficulty * 20;
+            int bombs = difficulty * 10;
             Random rand = new Random();
             while (bombs > 0)
-            {                
+            {
                 for (int _row = 0; _row < rows; _row++)
                 {
                     for (int _col = 0; _col < cols; _col++)
                     {
-                        if(rand.Next(0, 40) == 10)
+                        if (rand.Next(0, 80) == 10 && playGround[_col, _row] != 9)
                         {
                             playGround[_col, _row] = 9;
                             bombs--;
@@ -83,16 +85,59 @@ namespace Miny
                     //BOMB
                     if (playGround[_col, _row] == 9)
                     {
-                        button.Content = "X";
+                        button.Content = "";
+                        button.Background = Brushes.DarkGray;
                     }
-                    //FLAG
-                    if (playGround[_col, _row] == 11)
+                    //EXPLODED BOMB
+                    if (playGround[_col, _row] == 31)
                     {
-                        button.Content = "F";
+                        button.Content = "X";
                         button.Background = Brushes.Red;
                     }
+                    //FLAG NUMBER
+                    else if (playGround[_col, _row] >= 11 && playGround[_col, _row] <= 18)
+                    {
+                        button.Content = "F";
+                        button.Foreground = Brushes.Red;
+                        button.Background = Brushes.DarkGray;
+                    }
+                    //QUESTIONMARK NUMBER
+                    else if (playGround[_col, _row] >= 21 && playGround[_col, _row] <= 28)
+                    {
+                        button.Content = "F";
+                        button.Foreground = Brushes.Red;
+                        button.Background = Brushes.DarkGray;
+                    }
+                    //QUESTIONMARK BOMB
+                    else if (playGround[_col, _row] == 29)
+                    {
+                        button.Content = "F";
+                        button.Foreground = Brushes.Red;
+                        button.Background = Brushes.DarkGray;
+                    }
+                    //FLAG BOMB
+                    else if (playGround[_col, _row] == 19)
+                    {
+                        button.Content = "F";
+                        button.Foreground = Brushes.Red;
+                        button.Background = Brushes.DarkGray;
+                    }
+                    //FLAG EMPTY
+                    else if (playGround[_col, _row] == 20)
+                    {
+                        button.Content = "F";
+                        button.Foreground = Brushes.Red;
+                        button.Background = Brushes.DarkGray;
+                    }
+                    //QUESTIONMARK EMPTY
+                    else if (playGround[_col, _row] == 30)
+                    {
+                        button.Content = "F";
+                        button.Foreground = Brushes.Red;
+                        button.Background = Brushes.DarkGray;
+                    }
                     //EMPTY
-                    if (playGround[_col, _row] == 10)
+                    else if (playGround[_col, _row] == 10)
                     {
                         button.Content = "";
                         button.Background = Brushes.LightGray;
@@ -103,7 +148,6 @@ namespace Miny
                         button.Content = playGround[_col, _row].ToString();
                         button.Background = Brushes.LightGray;
                     }
-                    
                     //THIS IS NEODHALENO = 0
                     else if (playGround[_col, _row] == 0)
                     {
@@ -126,42 +170,42 @@ namespace Miny
             // LEFT
             if (_col > 0)
             {
-                if (playGround[_col - 1, _row] == 9) bombCounter++;
+                if (playGround[_col - 1, _row]%10 == 9) bombCounter++;
             }
             // LEFT DIAGONAL UP
             if (_col > 0 && _row > 0)
             {
-                if (playGround[_col - 1, _row - 1] == 9) bombCounter++;
+                if (playGround[_col - 1, _row - 1] % 10 == 9) bombCounter++;
             }
             // UP
             if (_row > 0)
             {
-                if (playGround[_col, _row - 1] == 9) bombCounter++;
+                if (playGround[_col, _row - 1] % 10 == 9) bombCounter++;
             }
             // RIGHT
             if (_col < cols - 1)
             {
-                if (playGround[_col + 1, _row] == 9) bombCounter++;
+                if (playGround[_col + 1, _row] % 10 == 9) bombCounter++;
             }
             // RIGHT DIAGONAL UP
             if (_col < cols - 1 && _row > 0)
             {
-                if (playGround[_col + 1, _row - 1] == 9) bombCounter++;
+                if (playGround[_col + 1, _row - 1] % 10 == 9) bombCounter++;
             }
             // DOWN
             if (_row < rows - 1)
             {
-                if (playGround[_col, _row + 1] == 9) bombCounter++;
+                if (playGround[_col, _row + 1] % 10 == 9) bombCounter++;
             }
             // LEFT DIAGONAL DOWN
             if (_col > 0 && _row < rows - 1)
             {
-                if (playGround[_col - 1, _row + 1] == 9) bombCounter++;
+                if (playGround[_col - 1, _row + 1] % 10 == 9) bombCounter++;
             }
             // RIGHT DIAGONAL DOWN
             if (_col < cols - 1 && _row < rows - 1)
             {
-                if (playGround[_col + 1, _row + 1] == 9) bombCounter++;
+                if (playGround[_col + 1, _row + 1] % 10 == 9) bombCounter++;
             }
 
             return bombCounter;
@@ -248,23 +292,52 @@ namespace Miny
 
         void checkClick(int col, int row)
         {
+            int value = playGround[col, row];
+
+            // CHECK FLAGS
+            if (value >= 11 && value <= 20)
+            {
+                playGround[col, row] = value % 10;
+            }
+            
             // BOMB CLICK
-            if (playGround[col, row] == 9)
+            if (value == 9)
             {
                 Announce.Foreground = Brushes.Red;
                 Announce.Content = "You lost!";
-                //startGame(cols, rows);
+                playGround[col, row] = 31;
             }
-            // 
-            // Debug.WriteLine(countBombs(playGround, col, row));
+
             // NEODHALENO FIELD CLICK
-            else if (playGround[col, row] == 0)
+            else if (value == 0)
             {
                 int count = countBombs(playGround, col, row);
-                if (count == 0) playGround[col, row] = 10;
+                if (count == 0)
+                {
+                    showNotShown(col, row);
+                    playGround[col, row] = 10;
+                }
                 else playGround[col, row] = count;
-                showNotShown(col, row);
-            };
+            }
+            // FLAG CLICK
+            renderGrid();
+
+        }
+
+        void placeFlag(int col, int row)
+        {
+            if (playGround[col, row] == 9)
+            {
+                playGround[col, row] = 19;
+            }
+            else if (playGround[col, row] == 0)
+            {
+                playGround[col, row] = 20;
+            }
+            else if (countBombs(playGround, col, row) > 0)
+            {
+                playGround[col, row] = countBombs(playGround, col, row) + 10;
+            }
             renderGrid();
         }
 
@@ -275,8 +348,8 @@ namespace Miny
         }
         void clickButtonRight(object sender, MouseEventArgs e)
         {
-            // playGround[Grid.GetColumn((Button)sender), Grid.GetRow((Button)sender)] = 11;
-            // renderGrid();
+            Debug.WriteLine("prdel");
+            placeFlag(Grid.GetColumn((Button)sender), Grid.GetRow((Button)sender));
         }
 
         void generateGrid(int cols, int rows)
