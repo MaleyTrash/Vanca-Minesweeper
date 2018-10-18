@@ -44,7 +44,7 @@ namespace Miny
         {
             Announce.Foreground = Brushes.Black;
             Announce.Content = "Game has started!";
-            playGround = new int[10, 10];
+            playGround = new int[cols, rows];
             lost = false;
             won = false;
             firstClick = false;
@@ -255,7 +255,7 @@ namespace Miny
                     playGround[nextCol, nextRow] = count;
                 }
             }
-            if (col < 9)
+            if (col < cols-1)
             {
                 int nextCol = col + 1;
                 int nextRow = row;
@@ -292,7 +292,7 @@ namespace Miny
                     playGround[nextCol, nextRow] = count;
                 }
             }
-            if (row < 9)
+            if (row < rows-1)
             {
                 int nextCol = col;
                 int nextRow = row + 1;
@@ -444,6 +444,27 @@ namespace Miny
             }
         }
 
-
+        private void Ez_Click(object sender, RoutedEventArgs e)
+        {
+            cols = 10;
+            rows = 10;
+            
+            difficulty = 1;
+            startGame(cols, rows);
+        }
+        private void Medium_Click(object sender, RoutedEventArgs e)
+        {
+            cols = 15;
+            rows = 15;
+            difficulty = 3;
+            startGame(cols, rows);
+        }
+        private void Hard_Click(object sender, RoutedEventArgs e)
+        {
+            cols = 25;
+            rows = 25;
+            difficulty = 8;
+            startGame(cols, rows);
+        }
     }
 }

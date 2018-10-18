@@ -16,7 +16,6 @@ D:\BOREC\Miny\Miny\obj\Debug\Miny.pdb
 C:\Users\vanca\clones\Vanca-Minesweeper\Miny\bin\Debug\Miny.exe.config
 C:\Users\vanca\clones\Vanca-Minesweeper\Miny\bin\Debug\Miny.exe
 C:\Users\vanca\clones\Vanca-Minesweeper\Miny\bin\Debug\Miny.pdb
-C:\Users\vanca\clones\Vanca-Minesweeper\Miny\obj\Debug\Miny.csprojAssemblyReference.cache
 C:\Users\vanca\clones\Vanca-Minesweeper\Miny\obj\Debug\MainWindow.g.cs
 C:\Users\vanca\clones\Vanca-Minesweeper\Miny\obj\Debug\App.g.cs
 C:\Users\vanca\clones\Vanca-Minesweeper\Miny\obj\Debug\Miny_MarkupCompile.cache
@@ -28,3 +27,4 @@ C:\Users\vanca\clones\Vanca-Minesweeper\Miny\obj\Debug\Miny.csproj.GenerateResou
 C:\Users\vanca\clones\Vanca-Minesweeper\Miny\obj\Debug\Miny.csproj.CoreCompileInputs.cache
 C:\Users\vanca\clones\Vanca-Minesweeper\Miny\obj\Debug\Miny.exe
 C:\Users\vanca\clones\Vanca-Minesweeper\Miny\obj\Debug\Miny.pdb
+C:\Users\vanca\clones\Vanca-Minesweeper\Miny\obj\Debug\Miny.csprojResolveAssemblyReference.cache
